@@ -1,0 +1,28 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker image
+      run: docker build -t student-portal:latest .
+
+    - name: List Docker images
+      run: docker images | grep student-portal
+
+    - name: Run container for testing
+      run: |
+        docker run -d -p 8080:80 --name test-container student-portal:latest
+        sleep 3
+        curl http://localhost:8080
+        docker stop test-container
